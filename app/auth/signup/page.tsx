@@ -32,7 +32,7 @@ export default function SignupPage() {
       }
 
       // 成功したらログイン画面 or トップへ遷移
-      router.push("/login")
+      router.push("/auth/login")
     } catch (e) {
       console.error(e)
       setError("通信エラーが発生しました")
