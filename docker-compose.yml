@@ -14,7 +14,7 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/my_app_db
     depends_on:
       - db
-    command: npm run dev:with-migrate
+    command: sh -c "npm install && npm run dev:with-migrate"
 
   db:
     image: postgres:16-alpine
