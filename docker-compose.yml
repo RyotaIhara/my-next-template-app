@@ -12,6 +12,8 @@ services:
     environment:
       NODE_ENV: development
       DATABASE_URL: postgres://postgres:postgres@db:5432/my_app_db
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "n6uO1+J8xgVqkrc9t2b7F1w0as8Hd4y2pEq1rK3oU2Q="
     depends_on:
       - db
     command: sh -c "npm install && npm run dev:with-migrate"
