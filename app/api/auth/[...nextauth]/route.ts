@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma"
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AuthButton from "@/components/AuthButton"
+import SessionProviderWrapper from "./SessionProviderWrapper"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,9 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body>
-        {children}
+        <SessionProviderWrapper>
+          <AuthButton />
+          {children}
+        </SessionProviderWrapper>
       </body>
     </html>
   );
