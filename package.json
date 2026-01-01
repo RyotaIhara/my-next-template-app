@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:deploy": "prisma migrate deploy",
+    "dev:with-migrate": "prisma migrate deploy && next dev"
   },
   "dependencies": {
     "@prisma/client": "^7.2.0",
