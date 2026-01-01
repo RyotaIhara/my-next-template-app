@@ -1,0 +1,12 @@
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String? @unique
+  emailVerified DateTime?
+  image         String?
+  hashedPassword String? // Email+Pass対応時に利用
+
+  accounts      Account[]
+  sessions      Session[]
+}
+
