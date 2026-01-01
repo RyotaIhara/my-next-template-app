@@ -8,6 +8,9 @@ WORKDIR /app
 # 依存関係だけ先にコピーして install（キャッシュ効かせる用）
 COPY package.json package-lock.json* ./
 
+# bash を追加
+RUN apk add --no-cache bash
+
 RUN npm install
 
 # アプリ本体をコピー
