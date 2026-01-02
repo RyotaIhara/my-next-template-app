@@ -1,4 +1,4 @@
-import { ISampleRepository } from "@/domain/repository/sample/ISampleRepository";
+import { ISampleRepository } from "@/infrastructure/repository/sample/ISampleRepository";
 import { Sample } from "@prisma/client";
 
 // application/usecases/GetSamplesUseCase.ts

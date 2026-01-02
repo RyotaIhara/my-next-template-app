@@ -1,6 +1,6 @@
 // application/factories/UseCaseFactory.ts
 import { GetSamplesUseCase } from "@/application/usecase/sample/GetSamplesUseCase";
-import { SampleRepository } from "@/domain/repository/sample/SampleRepository";
+import { SampleRepository } from "@/infrastructure/repository/sample/SampleRepository";
 
 export class SampleUseCaseFactory {
   private static sampleRepository: SampleRepository | null = null;
