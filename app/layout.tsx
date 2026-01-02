@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import AuthButton from "@/components/AuthButton"
+import AuthButton from "@/component/AuthButton"
 import SessionProviderWrapper from "./SessionProviderWrapper"
 
 export const metadata: Metadata = {
