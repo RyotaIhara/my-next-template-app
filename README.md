@@ -221,18 +221,117 @@ npx prisma migrate dev --create-only
 「元リポジトリとの関連を外して」から「新しいリポジトリに紐付け直す」ことで、  
 **ほぼ同じ内容の別リポジトリ**を作成することができます。
 
----
-
 ### 前提
 
 - Git がインストールされていること
 - GitHub アカウントを持っていること
 - 複製元リポジトリに読み取り権限があること（Public ならOK）
 
----
-
 ### 1. 元リポジトリをローカルに clone する
 
 ```bash
 git clone https://github.com/ORIGINAL_USER/ORIGINAL_REPO.git
 cd ORIGINAL_REPO
+```
+
+- `ORIGINAL_USER` : 元リポジトリ所有者のユーザー名 or Organization名
+- `ORIGINAL_REPO` : 元リポジトリ名
+
+### 2. 元リポジトリとの関連を削除する
+
+clone した直後は、`origin` が元リポジトリを指しています。  
+これを削除して、**一度関連をリセット**します。
+
+```bash
+git remote remove origin
+```
+
+確認したい場合：
+
+```bash
+git remote -v
+# 何も表示されなければOK
+```
+
+### 3. GitHub 上で新しいリポジトリを作成する
+
+1. GitHub にアクセス
+2. 右上の「＋」→ **New repository**
+3. 「Owner」「Repository name」などを入力
+4. **Initialize this repository with:** にはチェックを入れない（README等は作らない）
+5. **Create repository** をクリック
+
+> ✅ ローカル側ですでに履歴（コミット）があるため、  
+> 新リポジトリは「空の状態」で作成するのがポイントです。
+
+### 4. 新リポジトリを `origin` として紐付ける
+
+GitHubで作成した新リポジトリの URL を、  
+ローカルの `origin` として設定します。
+
+```bash
+git remote add origin https://github.com/YOUR_USER/NEW_REPO.git
+```
+
+- `YOUR_USER` : 自分の GitHub ユーザー名 or Organization名
+- `NEW_REPO`  : 新しく作成したリポジトリ名
+
+設定確認：
+
+```bash
+git remote -v
+# origin  https://github.com/YOUR_USER/NEW_REPO.git (push)
+# origin  https://github.com/YOUR_USER/NEW_REPO.git (fetch)
+```
+
+### 5. 既存の履歴を新リポジトリに push する
+
+通常は `main` or `master` ブランチを push します。  
+ブランチ名は自身の環境に合わせて読み替えてください。
+
+```bash
+git push -u origin main
+# もしくは
+git push -u origin master
+```
+
+> `-u` を付けることで、今後 `git push` だけで  
+> `origin main` へ push されるようになります。
+
+### 6. （必要に応じて）他のブランチやタグも push する
+
+複製元リポジトリに複数ブランチ・タグがある場合は、必要に応じて push します。
+
+#### すべてのブランチを push
+
+```bash
+git push --all origin
+```
+
+#### すべてのタグを push
+
+```bash
+git push --tags origin
+```
+
+### 7. これで複製完了
+
+ここまでの手順で、
+
+- コード・コミット履歴は引き継がれる
+- 元リポジトリとの remote 関係はない
+- 新しいリポジトリとして独立して運用できる
+
+という状態になります。
+
+### 補足：Fork との違い
+
+- **この方法**  
+  - 元リポジトリとの関連は一切ない  
+  - 完全に独立したプロジェクトとして扱える  
+- **Fork**  
+  - GitHub 上で「フォーク元」として関連が残る  
+  - PR などを送りやすいが、関係性も見える
+
+「社内用にコピーしたい」「別プロジェクトとして運用したい」  
+といった場合は、この clone → remote 付け替えの方法が便利です。
