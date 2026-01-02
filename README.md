@@ -214,3 +214,25 @@ npx prisma migrate dev --create-only
 
 # --create-onlyを消せば、DBにも反映できる
 ```
+
+## GitHubリポジトリを複製する手順（Clone → 新リポジトリに紐付け）
+
+元のリポジトリをローカルに clone し、  
+「元リポジトリとの関連を外して」から「新しいリポジトリに紐付け直す」ことで、  
+**ほぼ同じ内容の別リポジトリ**を作成することができます。
+
+---
+
+### 前提
+
+- Git がインストールされていること
+- GitHub アカウントを持っていること
+- 複製元リポジトリに読み取り権限があること（Public ならOK）
+
+---
+
+### 1. 元リポジトリをローカルに clone する
+
+```bash
+git clone https://github.com/ORIGINAL_USER/ORIGINAL_REPO.git
+cd ORIGINAL_REPO
