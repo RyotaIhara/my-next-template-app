@@ -364,3 +364,25 @@ git push --tags origin
 - コンテナ内でインストールされた依存関係が保持される
 
 ローカルの`node_modules`をマウントしたい場合は、`node_modules:/app/node_modules`の行を削除してください（非推奨）。
+
+### Docker設定ファイルの管理
+
+Docker関連の設定ファイルは`docker/`フォルダにまとめて管理しています：
+
+- `docker/apk-packages.txt` - Alpine Linuxでインストールするパッケージのリスト
+  - 新しいパッケージを追加する場合は、このファイルに1行ずつ追加してください
+  - 例: `bash`, `coreutils`, `less`, `vim`など
+
+- `docker/bash-aliases.txt` - bashエイリアスの設定
+  - よく使うコマンドのエイリアスを定義
+  - 例: `ll`（`ls -alF`のエイリアス）、`la`、`l`など
+  - 新しいエイリアスを追加する場合は、このファイルに1行ずつ追加してください
+
+これらの設定ファイルを変更した場合は、コンテナを再ビルドすることで反映されます：
+
+```bash
+docker-compose build
+docker-compose up
+```
+
+今後、新しいDocker設定ファイルを追加する場合は、`docker/`フォルダ内に配置してください。
