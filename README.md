@@ -12,12 +12,23 @@
 ```mermaid
 graph TB
     subgraph "プレゼンテーション層 (Presentation Layer)"
-        A[app/sample/page.tsx<br/>Next.js Page Component]
+        A["app/sample/page.tsx<br/>Next.js Client Component"]
+        A1["app/sample/create/page.tsx"]
+        A2["app/sample/update/id/page.tsx"]
+        A3["app/sample/component/form.tsx"]
+    end
+    
+    subgraph "API層 (API Layer)"
+        API1["app/api/sample/route.ts<br/>GET, POST"]
+        API2["app/api/sample/id/route.ts<br/>GET, PUT"]
     end
     
     subgraph "アプリケーション層 (Application Layer)"
-        B[application/factories/<br/>SampleUseCaseFactory]
-        C[application/usecase/sample/<br/>GetSamplesUseCase]
+        B[application/factory/<br/>SampleUseCaseFactory]
+        C1[application/usecase/sample/<br/>GetSamplesUseCase]
+        C2[application/usecase/sample/<br/>GetSampleByIdUseCase]
+        C3[application/usecase/sample/<br/>CreateSampleUseCase]
+        C4[application/usecase/sample/<br/>UpdateSampleUseCase]
     end
     
     subgraph "インフラ層 (Infrastructure Layer)"
@@ -30,45 +41,70 @@ graph TB
         G[(PostgreSQL)]
     end
     
-    A -->|"UseCaseFactoryを使用"| B
-    B -->|"UseCaseを生成"| C
-    C -->|"Repositoryインターフェースに依存"| D
+    A -->|"fetch /api/sample"| API1
+    A1 -->|"fetch /api/sample POST"| API1
+    A2 -->|"fetch /api/sample/[id]"| API2
+    
+    API1 -->|"UseCaseFactoryを使用"| B
+    API2 -->|"UseCaseFactoryを使用"| B
+    
+    B -->|"UseCaseを生成"| C1
+    B -->|"UseCaseを生成"| C2
+    B -->|"UseCaseを生成"| C3
+    B -->|"UseCaseを生成"| C4
+    
+    C1 -->|"Repositoryインターフェースに依存"| D
+    C2 -->|"Repositoryインターフェースに依存"| D
+    C3 -->|"Repositoryインターフェースに依存"| D
+    C4 -->|"Repositoryインターフェースに依存"| D
+    
     E -->|"インターフェースを実装"| D
     E -->|"Prisma Clientを使用"| F
     F -->|"データアクセス"| G
     
     style A fill:#e1f5ff
+    style A1 fill:#e1f5ff
+    style A2 fill:#e1f5ff
+    style A3 fill:#e1f5ff
+    style API1 fill:#d4edda
+    style API2 fill:#d4edda
     style B fill:#fff4e1
-    style C fill:#fff4e1
+    style C1 fill:#fff4e1
+    style C2 fill:#fff4e1
+    style C3 fill:#fff4e1
+    style C4 fill:#fff4e1
     style D fill:#ffe1f5
     style E fill:#ffe1f5
     style F fill:#ffe1f5
     style G fill:#f0f0f0
 ```
 
-#### データフロー
+#### データフロー（一覧取得の例）
 ```mermaid
 sequenceDiagram
-    participant Page as app/sample/page.tsx
+    participant Page as app/sample/page.tsx<br/>(Client Component)
+    participant API as app/api/sample/route.ts
     participant Factory as SampleUseCaseFactory
     participant UseCase as GetSamplesUseCase
     participant Repo as SampleRepository
     participant Prisma as Prisma Client
     participant DB as PostgreSQL
     
-    Page->>Factory: createGetSamplesUseCase()
+    Page->>API: GET /api/sample
+    API->>Factory: createGetSamplesUseCase()
     Factory->>Repo: new SampleRepository()
     Factory->>UseCase: new GetSamplesUseCase(repo)
-    Factory-->>Page: GetSamplesUseCase
+    Factory-->>API: GetSamplesUseCase
     
-    Page->>UseCase: execute()
+    API->>UseCase: execute()
     UseCase->>Repo: findAll()
     Repo->>Prisma: prisma.sample.findMany()
     Prisma->>DB: SELECT * FROM Sample
     DB-->>Prisma: Sample[]
     Prisma-->>Repo: Sample[]
     Repo-->>UseCase: Sample[]
-    UseCase-->>Page: Sample[]
+    UseCase-->>API: Sample[]
+    API-->>Page: JSON Response
     Page->>Page: レンダリング
 ```
 
@@ -76,14 +112,29 @@ sequenceDiagram
 ```
 app/                          # プレゼンテーション層
 ├── sample/
-│   └── page.tsx             # ページコンポーネント
+│   ├── page.tsx             # 一覧ページ（クライアントコンポーネント）
+│   ├── create/
+│   │   └── page.tsx         # 作成ページ
+│   ├── update/
+│   │   └── [id]/
+│   │       └── page.tsx     # 更新ページ
+│   └── component/
+│       └── form.tsx          # フォームコンポーネント
+└── api/                      # API層
+    └── sample/
+        ├── route.ts          # GET（一覧）, POST（作成）
+        └── [id]/
+            └── route.ts      # GET（取得）, PUT（更新）
 
 application/                  # アプリケーション層
-├── factories/                # UseCase生成ファクトリ
+├── factory/                  # UseCase生成ファクトリ
 │   └── SampleUseCaseFactory.ts
 └── usecase/                  # ユースケース
     └── sample/
-        └── GetSamplesUseCase.ts
+        ├── GetSamplesUseCase.ts
+        ├── GetSampleByIdUseCase.ts
+        ├── CreateSampleUseCase.ts
+        └── UpdateSampleUseCase.ts
 
 infrastructure/               # インフラ層
 └── repository/               # リポジトリ実装
@@ -97,10 +148,18 @@ lib/                          # インフラ層（共通）
 
 #### 依存関係の原則
 
-- **プレゼンテーション層** → **アプリケーション層**のみに依存
+- **プレゼンテーション層** → **API層**のみに依存（HTTPリクエスト経由）
+- **API層** → **アプリケーション層**のみに依存（UseCaseFactory経由）
 - **アプリケーション層** → **インフラ層のインターフェース**に依存
 - **インフラ層** → **インターフェースを実装**し、**Prisma Client**を使用
 - 内側の層は外側の層に依存しない（依存性の逆転の原則）
+
+#### APIエンドポイント
+
+- `GET /api/sample` - サンプル一覧を取得
+- `POST /api/sample` - サンプルを作成
+- `GET /api/sample/[id]` - 指定IDのサンプルを取得
+- `PUT /api/sample/[id]` - 指定IDのサンプルを更新
 
 ## よく使用するコマンド
 

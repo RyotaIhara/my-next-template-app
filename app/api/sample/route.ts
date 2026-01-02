@@ -1,8 +1,24 @@
-// app/api/sample/create/route.ts
+// app/api/sample/route.ts
 import { NextResponse } from "next/server";
 import { SampleUseCaseFactory } from "@/application/factory/SampleUseCaseFactory";
 
-// POST /api/sample/create
+// GET /api/sample
+export async function GET() {
+  try {
+    const getSamplesUseCase = SampleUseCaseFactory.createGetSamplesUseCase();
+    const samples = await getSamplesUseCase.execute();
+
+    return NextResponse.json(samples);
+  } catch (error) {
+    console.error("get samples error", error);
+    return NextResponse.json(
+      { error: "サーバーエラーが発生しました" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/sample
 export async function POST(req: Request) {
   try {
     const { name, memo } = await req.json();
@@ -26,4 +42,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

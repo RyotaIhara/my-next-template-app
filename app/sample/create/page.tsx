@@ -14,7 +14,7 @@ export default function CreateSamplePage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/sample/create", {
+      const res = await fetch("/api/sample", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
