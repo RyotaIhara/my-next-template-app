@@ -335,3 +335,32 @@ git push --tags origin
 
 「社内用にコピーしたい」「別プロジェクトとして運用したい」  
 といった場合は、この clone → remote 付け替えの方法が便利です。
+
+## Dockerについて
+
+### コンテナ起動時の自動処理
+
+コンテナ起動時には、以下の処理が自動的に実行されます：
+
+1. `npm install` - 依存関係のインストール
+2. `npm run dev:with-migrate` が実行され、以下が順に実行されます：
+   - `prisma generate --schema=./prisma/schema` - Prisma Clientの生成
+   - `prisma migrate deploy --schema=./prisma/schema` - マイグレーションの適用
+   - `next dev` - Next.js開発サーバーの起動
+
+**重要**: モデル定義（Prismaスキーマ）を変更した場合、コンテナを再起動することで自動的に`prisma generate`が実行され、Prisma Clientが再生成されます。手動で`npx prisma generate`を実行する必要はありません。
+
+### ボリュームマウントの仕組み
+
+`docker-compose.yml`では、以下のボリュームマウントが設定されています：
+
+- `.:/app` - ローカルのプロジェクト全体をコンテナの`/app`にマウント（ホットリロード用）
+- `node_modules:/app/node_modules` - Dockerが管理する名前付きボリュームを`/app/node_modules`にマウント
+
+**注意**: `node_modules`はローカルのファイルシステムではなく、Dockerの名前付きボリュームとして管理されています。これにより：
+
+- プラットフォーム固有のバイナリ（ネイティブモジュールなど）が正しく動作する
+- ローカルの`node_modules`とコンテナ内の`node_modules`の競合を回避できる
+- コンテナ内でインストールされた依存関係が保持される
+
+ローカルの`node_modules`をマウントしたい場合は、`node_modules:/app/node_modules`の行を削除してください（非推奨）。
