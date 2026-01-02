@@ -195,6 +195,7 @@ lib/                          # インフラ層（共通）
 - `POST /api/sample` - サンプルを作成
 - `GET /api/sample/[id]` - 指定IDのサンプルを取得
 - `PUT /api/sample/[id]` - 指定IDのサンプルを更新
+- `DELETE /api/sample/[id]` - 指定IDのサンプルを削除
 
 ## よく使用するコマンド
 
