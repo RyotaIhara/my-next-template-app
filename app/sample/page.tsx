@@ -14,30 +14,60 @@ export default function SamplePage() {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const fetchSamples = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch("/api/sample");
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error ?? "サンプルの取得に失敗しました");
+        return;
+      }
+
+      const data = await res.json();
+      setSamples(data);
+    } catch (e) {
+      console.error(e);
+      setError("通信エラーが発生しました");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSamples = async () => {
-      try {
-        const res = await fetch("/api/sample");
-
-        if (!res.ok) {
-          const data = await res.json().catch(() => null);
-          setError(data?.error ?? "サンプルの取得に失敗しました");
-          return;
-        }
-
-        const data = await res.json();
-        setSamples(data);
-      } catch (e) {
-        console.error(e);
-        setError("通信エラーが発生しました");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSamples();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("本当に削除しますか？")) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/sample/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        alert(data?.error ?? "削除に失敗しました");
+        return;
+      }
+
+      // 削除成功後、一覧を再取得
+      await fetchSamples();
+    } catch (e) {
+      console.error(e);
+      alert("通信エラーが発生しました");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -101,12 +131,21 @@ export default function SamplePage() {
                     {s.memo}
                   </p>
                 )}
-                <Link
-                  href={`/sample/update/${s.id}`}
-                  className="mt-auto bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition text-center block"
-                >
-                  更新
-                </Link>
+                <div className="mt-auto flex gap-2">
+                  <Link
+                    href={`/sample/update/${s.id}`}
+                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition text-center"
+                  >
+                    更新
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(s.id)}
+                    disabled={deletingId === s.id}
+                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {deletingId === s.id ? "削除中..." : "削除"}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

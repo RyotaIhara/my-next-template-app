@@ -6,4 +6,5 @@ export interface ISampleRepository {
   findById(id: number): Promise<Sample | null>;
   create(name: string, memo: string): Promise<Sample>;
   update(id: number, name: string, memo: string): Promise<Sample>;
+  delete(id: number): Promise<void>;
 }

@@ -76,3 +76,32 @@ export async function PUT(
   }
 }
 
+// DELETE /api/sample/[id]
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const sampleId = parseInt(id, 10);
+
+    if (isNaN(sampleId)) {
+      return NextResponse.json(
+        { error: "無効なIDです" },
+        { status: 400 }
+      );
+    }
+
+    const deleteSampleUseCase = SampleUseCaseFactory.createDeleteSampleUseCase();
+    await deleteSampleUseCase.execute(sampleId);
+
+    return NextResponse.json({ message: "削除しました" }, { status: 200 });
+  } catch (error) {
+    console.error("delete sample error", error);
+    return NextResponse.json(
+      { error: "サーバーエラーが発生しました" },
+      { status: 500 }
+    );
+  }
+}
+

@@ -32,4 +32,10 @@ export class SampleRepository implements ISampleRepository {
       } as Prisma.SampleUpdateInput,
     });
   }
+  
+  async delete(id: number): Promise<void> {
+    await prisma.sample.delete({
+      where: { id },
+    });
+  }
 }

@@ -3,6 +3,7 @@ import { GetSamplesUseCase } from "@/application/usecase/sample/GetSamplesUseCas
 import { GetSampleByIdUseCase } from "@/application/usecase/sample/GetSampleByIdUseCase";
 import { CreateSampleUseCase } from "@/application/usecase/sample/CreateSampleUseCase";
 import { UpdateSampleUseCase } from "@/application/usecase/sample/UpdateSampleUseCase";
+import { DeleteSampleUseCase } from "@/application/usecase/sample/DeleteSampleUseCase";
 import { SampleRepository } from "@/infrastructure/repository/sample/SampleRepository";
 
 export class SampleUseCaseFactory {
@@ -29,5 +30,9 @@ export class SampleUseCaseFactory {
   
   static createUpdateSampleUseCase(): UpdateSampleUseCase {
     return new UpdateSampleUseCase(this.getSampleRepository());
+  }
+  
+  static createDeleteSampleUseCase(): DeleteSampleUseCase {
+    return new DeleteSampleUseCase(this.getSampleRepository());
   }
 }
