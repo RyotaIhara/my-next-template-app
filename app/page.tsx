@@ -6,14 +6,7 @@ export default async function Home() {
 
   return (
     <div>
-      <h1>Sample List</h1>
-      <ul>
-        {samples.map((s) => (
-          <li key={s.id}>
-            {s.id}: {s.name} ({s.createdAt.toISOString()})
-          </li>
-        ))}
-      </ul>
+      <h1>Hello World</h1>
     </div>
   );
 }
