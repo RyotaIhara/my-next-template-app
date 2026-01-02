@@ -1,73 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-
-interface Sample {
-  id: number;
-  name: string;
-  memo: string;
-  createdAt: Date;
-}
+import { useSamples } from "./hooks/useSamples";
+import { useDeleteSample } from "./hooks/useDeleteSample";
 
 export default function SamplePage() {
-  const [samples, setSamples] = useState<Sample[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  const fetchSamples = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch("/api/sample");
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error ?? "サンプルの取得に失敗しました");
-        return;
-      }
-
-      const data = await res.json();
-      setSamples(data);
-    } catch (e) {
-      console.error(e);
-      setError("通信エラーが発生しました");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSamples();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    if (!confirm("本当に削除しますか？")) {
-      return;
-    }
-
-    setDeletingId(id);
-    try {
-      const res = await fetch(`/api/sample/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        alert(data?.error ?? "削除に失敗しました");
-        return;
-      }
-
-      // 削除成功後、一覧を再取得
-      await fetchSamples();
-    } catch (e) {
-      console.error(e);
-      alert("通信エラーが発生しました");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  const { samples, loading, error, fetchSamples } = useSamples();
+  const { handleDelete, deletingId } = useDeleteSample(fetchSamples);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-8 px-4">

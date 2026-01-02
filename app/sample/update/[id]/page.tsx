@@ -1,84 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import SampleForm from "../../component/form";
+import { useSampleById } from "../../hooks/useSampleById";
+import { useUpdateSample } from "../../hooks/useUpdateSample";
 
 export default function UpdateSamplePage() {
-  const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   
-  const [name, setName] = useState("");
-  const [memo, setMemo] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const { sample, loading: initialLoading, error: fetchError } = useSampleById(id);
+  const { handleSubmit, handleCancel, loading, error: updateError } = useUpdateSample(id);
 
-  // 既存データを取得
-  useEffect(() => {
-    const fetchSample = async () => {
-      try {
-        const res = await fetch(`/api/sample/${id}`);
-        
-        if (!res.ok) {
-          if (res.status === 404) {
-            setError("サンプルが見つかりません");
-          } else {
-            setError("データの取得に失敗しました");
-          }
-          return;
-        }
-
-        const sample = await res.json();
-        setName(sample.name);
-        setMemo(sample.memo);
-      } catch (e) {
-        console.error(e);
-        setError("通信エラーが発生しました");
-      } finally {
-        setInitialLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchSample();
-    }
-  }, [id]);
-
-  const handleSubmit = async (name: string, memo: string) => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const res = await fetch(`/api/sample/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, memo }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error ?? "サンプルの更新に失敗しました");
-        return;
-      }
-
-      // 成功したら一覧画面へ遷移
-      router.push("/sample");
-    } catch (e) {
-      console.error(e);
-      setError("通信エラーが発生しました");
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    router.push("/sample");
-  };
+  const error = fetchError || updateError;
 
   if (initialLoading) {
     return (
@@ -101,8 +35,8 @@ export default function UpdateSamplePage() {
         </div>
 
         <SampleForm
-          initialName={name}
-          initialMemo={memo}
+          initialName={sample?.name ?? ""}
+          initialMemo={sample?.memo ?? ""}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           submitButtonText="更新"

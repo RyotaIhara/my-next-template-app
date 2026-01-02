@@ -1,47 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import SampleForm from "../component/form";
+import { useCreateSample } from "../hooks/useCreateSample";
 
 export default function CreateSamplePage() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (name: string, memo: string) => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/sample", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, memo }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error ?? "サンプルの作成に失敗しました");
-        return;
-      }
-
-      // 成功したら一覧画面へ遷移
-      router.push("/sample");
-    } catch (e) {
-      console.error(e);
-      setError("通信エラーが発生しました");
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    router.push("/sample");
-  };
+  const { handleSubmit, handleCancel, loading, error } = useCreateSample();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-8 px-4">
