@@ -12,10 +12,12 @@ COPY package.json package-lock.json* ./
 COPY docker/apk-packages.txt ./
 RUN apk add --no-cache $(cat apk-packages.txt | tr '\n' ' ')
 
-# エイリアス設定をコピーして適用
+# エイリアス設定をコピーして適用（複数の場所に設定）
 COPY docker/bash-aliases.txt ./
-RUN cat bash-aliases.txt >> /etc/profile.d/aliases.sh && \
-    chmod +x /etc/profile.d/aliases.sh
+RUN cat bash-aliases.txt >> /root/.bashrc && \
+    cat bash-aliases.txt >> /root/.profile && \
+    mkdir -p /etc/bash && \
+    cat bash-aliases.txt >> /etc/bash/bashrc
 
 RUN npm install
 
