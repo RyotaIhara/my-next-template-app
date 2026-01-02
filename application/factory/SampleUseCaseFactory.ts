@@ -1,6 +1,8 @@
 // application/factories/UseCaseFactory.ts
 import { GetSamplesUseCase } from "@/application/usecase/sample/GetSamplesUseCase";
+import { GetSampleByIdUseCase } from "@/application/usecase/sample/GetSampleByIdUseCase";
 import { CreateSampleUseCase } from "@/application/usecase/sample/CreateSampleUseCase";
+import { UpdateSampleUseCase } from "@/application/usecase/sample/UpdateSampleUseCase";
 import { SampleRepository } from "@/infrastructure/repository/sample/SampleRepository";
 
 export class SampleUseCaseFactory {
@@ -17,7 +19,15 @@ export class SampleUseCaseFactory {
     return new GetSamplesUseCase(this.getSampleRepository());
   }
   
+  static createGetSampleByIdUseCase(): GetSampleByIdUseCase {
+    return new GetSampleByIdUseCase(this.getSampleRepository());
+  }
+  
   static createCreateSampleUseCase(): CreateSampleUseCase {
     return new CreateSampleUseCase(this.getSampleRepository());
+  }
+  
+  static createUpdateSampleUseCase(): UpdateSampleUseCase {
+    return new UpdateSampleUseCase(this.getSampleRepository());
   }
 }
